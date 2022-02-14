@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Patrimonio.Contexts;
 using Patrimonio.Domains;
+using Patrimonio.Interfaces;
 using Patrimonio.Utils;
 
 namespace Patrimonio.Controllers
@@ -15,25 +16,25 @@ namespace Patrimonio.Controllers
     [ApiController]
     public class EquipamentosController : ControllerBase
     {
-        private readonly PatrimonioContext _context;
+        private readonly IEquipamentoRepository _equipamentoRepository;
 
-        public EquipamentosController(PatrimonioContext context)
+        public EquipamentosController(IEquipamentoRepository repo)
         {
-            _context = context;
+            _equipamentoRepository = repo;
         }
 
         // GET: api/Equipamentos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Equipamento>>> GetEquipamentos()
+        public ActionResult<IEnumerable<Equipamento>> GetEquipamentos()
         {
-            return await _context.Equipamentos.ToListAsync();
+            return Ok(_equipamentoRepository.Listar());
         }
 
         // GET: api/Equipamentos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Equipamento>> GetEquipamento(int id)
+        public ActionResult<Equipamento> GetEquipamento(int id)
         {
-            var equipamento = await _context.Equipamentos.FindAsync(id);
+            var equipamento = _equipamentoRepository.BuscarPorID(id);
 
             if (equipamento == null)
             {
@@ -46,18 +47,18 @@ namespace Patrimonio.Controllers
         // PUT: api/Equipamentos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEquipamento(int id, Equipamento equipamento)
+        public ActionResult<Equipamento> PutEquipamento(int id, Equipamento equipamento)
         {
             if (id != equipamento.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(equipamento).State = EntityState.Modified;
+            _equipamentoRepository.Cadastrar(equipamento);
 
             try
             {
-                await _context.SaveChangesAsync();
+                 //_equipamentoRepository.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -77,7 +78,7 @@ namespace Patrimonio.Controllers
         // POST: api/Equipamentos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Equipamento>> PostEquipamento([FromForm] Equipamento equipamento, IFormFile arquivo)
+        public ActionResult<Equipamento> PostEquipamento([FromForm] Equipamento equipamento, IFormFile arquivo)
         {
 
             #region Upload da Imagem com extensões permitidas apenas
@@ -100,24 +101,24 @@ namespace Patrimonio.Controllers
             // Pegando o horário do sistema
             equipamento.DataCadastro = DateTime.Now;
 
-            _context.Equipamentos.Add(equipamento);
-            await _context.SaveChangesAsync();
+            _equipamentoRepository.Cadastrar(equipamento);
+            //_equipamentoRepository.SaveChangesAsync();
 
             return Created("Equipamento", equipamento);
         }
 
         // DELETE: api/Equipamentos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEquipamento(int id)
+        public ActionResult DeleteEquipamento(int id)
         {
-            var equipamento = await _context.Equipamentos.FindAsync(id);
+            var equipamento = _equipamentoRepository.BuscarPorID(id);
             if (equipamento == null)
             {
                 return NotFound();
             }
 
-            _context.Equipamentos.Remove(equipamento);
-            await _context.SaveChangesAsync();
+            _equipamentoRepository.Excluir(equipamento);
+            //_equipamentoRepository.SaveChangesAsync();
 
             // Removendo Arquivo do servidor
             Upload.RemoverArquivo(equipamento.Imagem);
@@ -127,7 +128,13 @@ namespace Patrimonio.Controllers
 
         private bool EquipamentoExists(int id)
         {
-            return _context.Equipamentos.Any(e => e.Id == id);
+            var resultado = _equipamentoRepository.BuscarPorID(id);
+            if(resultado != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
