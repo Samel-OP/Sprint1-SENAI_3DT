@@ -110,7 +110,7 @@ export const Patrimonio = () => {
               <input
                 className="input__login" 
                 type="text" 
-                name="nomePatrimonio" 
+                name="codigoPatrimonio" 
                 id="nomePatrimonio" 
                 placeholder="Código do Patrimonio"
                 value={descricao}

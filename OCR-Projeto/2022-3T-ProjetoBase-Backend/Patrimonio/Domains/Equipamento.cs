@@ -15,7 +15,7 @@ namespace Patrimonio.Domains
         public string Imagem { get; set; }
         public string Descricao { get; set; }
         public bool? Ativo { get; set; }
-        public DateTime DataCadastro { get; set; }
+        public DateTime? DataCadastro { get; set; }
         public string NomePatrimonio { get; set; }
     }
 }

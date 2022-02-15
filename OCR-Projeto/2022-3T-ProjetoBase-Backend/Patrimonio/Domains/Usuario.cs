@@ -11,7 +11,7 @@ namespace Patrimonio.Domains
         
         public int Id { get; set; }
         public int IdPerfils { get; set; }
-        public string Senha { get; set; }
+        public string? Senha { get; set; }
         public string Email { get; set; }
         public virtual Perfil IdPerfilsNavigation { get; set; }
     }

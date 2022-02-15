@@ -22,7 +22,7 @@ namespace Patrimonio.Test.Domains
             bool resultado = true;
 
             if(equipamento.Id == 0 || equipamento.Imagem == null || equipamento.Descricao == null || 
-               equipamento.Ativo == null || equipamento.NomePatrimonio == null)
+               equipamento.Ativo == null || equipamento.DataCadastro == null || equipamento.NomePatrimonio == null)
             {
                 resultado = false;
             }
